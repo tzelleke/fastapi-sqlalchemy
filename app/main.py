@@ -30,7 +30,7 @@ templates = Jinja2Templates(directory="app/templates")
 templates.env.globals["TITLE"] = PROJECT_NAME
 
 
-@app.get("/", response_class=HTMLResponse)
+@app.get("/", response_class=HTMLResponse, include_in_schema=False)
 async def homepage(*, request: Request):
     return templates.TemplateResponse(
         "index.html", {"request": request, "name": "Friends",}
