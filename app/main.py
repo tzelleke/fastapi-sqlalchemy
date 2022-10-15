@@ -14,8 +14,15 @@ from app.core.config import (
     ROOT_PATH,
 )
 
+description = """
+<a href="/">&lt;-Home</a>
+"""
 app = FastAPI(
-    root_path=ROOT_PATH, title=f"{PROJECT_NAME} API", version=API_VERSION, debug=DEBUG,
+    root_path=ROOT_PATH,
+    title=f"{PROJECT_NAME} API",
+    version=API_VERSION,
+    debug=DEBUG,
+    description=description,
 )
 app.include_router(api_router, prefix=f"/api")
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
