@@ -1,14 +1,19 @@
-version: '3'
+version: '3.9'
 
 services:
   app:
     build:
       context: .
+      target: dev
     image: tzelleke/fastapi-sqlalchemy
     environment:
       DATABASE_URL: sqlite:////app/db.sqlite
+      LOG_LEVEL: debug
+      HOST: "0.0.0.0"
+      PORT: "8080"
+    user: "${UID:-1000}:${GID:-1000}"
     volumes:
       - ./:/app
     ports:
-      - "127.0.0.1:${PORT:-8080}:80"
-    command: ["uvicorn", "app.main:app", "--reload", "--host", "0.0.0.0", "--port", "80", "--log-level", "$LOG_LEVEL"]
+      - "127.0.0.1:${PORT:-8080}:8080"
+    command: "/start-reload.sh"
