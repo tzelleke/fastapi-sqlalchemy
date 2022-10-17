@@ -58,6 +58,23 @@ docker-compose [run | exec] app alembic upgrade head
 docker-compose [run | exec] app inv seed
 ```
 
-### Housekeeping tasks
+## Housekeeping tasks
 
 [pyinvoke](https://docs.pyinvoke.org/en/stable/getting-started.html) is used to run project-related tasks.
+
+## Project documentation
+
+Project documentation is build with [mkdocs-material](https://squidfunk.github.io/mkdocs-material/).
+
+`./github/workflows/ci.yml` defines a workflow to build the documentation on GitHub and publish to GitHub Pages.
+
+You can work on the docs alongside local development.
+
+```shell
+# start local docs site
+docker-compose up [-d] docs
+```
+
+The local `docs` service (see `docker-compose.yml`) is build from `Dockerfile.mkdocs` which installs additional mkdocs extensions into the base image.  
+!You have to add these extensions to the GitHub Actions workflow as well.
+
