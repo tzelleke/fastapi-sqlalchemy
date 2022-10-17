@@ -2,6 +2,8 @@
 
 This is a demo / starter project.
 
+[Live demo](https://tz-fastapi-sqlalchemy.herokuapp.com/)
+
 ## What is included
 
 - FastAPI
