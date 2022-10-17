@@ -1,0 +1,32 @@
+site_name: FastAPI-SQLAlchemy
+repo_url: https://github.com/tzelleke/fastapi-sqlalchemy
+theme:
+  name: material
+  palette:
+    scheme: slate
+    primary: deep-purple
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - tables
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.snippets
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.superfences:
+      custom_fences: # make exceptions to highlighting of code:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:mermaid2.fence_mermaid
+plugins:
+  - search:
+  - mkdocstrings:
+  - awesome-pages:
+  - macros:
+  - mermaid2:
+      arguments:
+        theme: 'dark'
+extra_javascript:
+  - https://unpkg.com/mermaid/dist/mermaid.min.js

@@ -2,7 +2,8 @@
 
 This is a demo / starter project.
 
-[Live demo](https://tz-fastapi-sqlalchemy.herokuapp.com/)
+- [Live demo](https://tz-fastapi-sqlalchemy.herokuapp.com/)
+- [Documentation](https://tzelleke.github.io/fastapi-sqlalchemy/)
 
 ## What is included
 

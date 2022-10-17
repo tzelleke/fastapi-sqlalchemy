@@ -17,3 +17,14 @@ services:
     ports:
       - "127.0.0.1:${PORT:-8080}:8080"
     command: "/start-reload.sh"
+
+  docs:
+    build:
+      dockerfile: Dockerfile.mkdocs
+      context: .
+    image: tzelleke/fastapi-sqlalchemy-docs
+    user: "${UID:-1000}:${GID:-1000}"
+    volumes:
+      - ./:/docs
+    ports:
+      - "127.0.0.1:8000:8000"
