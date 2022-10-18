@@ -10,6 +10,8 @@ markdown_extensions:
   - attr_list
   - def_list
   - tables
+  - pymdownx.tabbed:
+      alternate_style: true
   - pymdownx.tasklist:
       custom_checkbox: true
   - pymdownx.snippets
