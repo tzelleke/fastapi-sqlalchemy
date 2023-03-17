@@ -4,6 +4,20 @@ on:
     branches:
       - master
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: docker/setup-buildx-action@v2
+      - uses: docker/build-push-action@v4
+        with:
+          context: .
+          target: dev
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          load: true
+          tags: test_image:latest
+      - run: docker run test_image:latest poetry about
   deploy:
     runs-on: ubuntu-latest
     steps:
