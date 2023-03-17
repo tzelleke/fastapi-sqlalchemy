@@ -1,6 +1,6 @@
 FROM tiangolo/uvicorn-gunicorn:python3.10 as dev
 ARG USER=fastapi
-ENV POETRY_VERSION=1.2.0 \
+ENV POETRY_VERSION=1.4 \
     POETRY_VIRTUALENVS_CREATE=true
 RUN echo $POETRY_VERSION
 RUN pip install -U --no-cache-dir pip && \
