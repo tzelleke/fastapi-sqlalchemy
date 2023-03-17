@@ -1,4 +1,4 @@
-FROM tiangolo/uvicorn-gunicorn:python3.9 as dev
+FROM tiangolo/uvicorn-gunicorn:python3.10 as dev
 ARG USER=fastapi
 ENV POETRY_VERSION=1.2.0 \
     POETRY_VIRTUALENVS_CREATE=true
@@ -14,7 +14,7 @@ RUN ln -s $(poetry env info --path) "/home/${USER}/venv"
 ENV PATH="/home/${USER}/venv/bin:${PATH}"
 COPY ./ /app
 
-FROM tiangolo/uvicorn-gunicorn:python3.9-slim as prod
+FROM tiangolo/uvicorn-gunicorn:python3.10-slim as prod
 ARG USER=fastapi
 RUN pip install -U --no-cache-dir pip && \
     pip uninstall -y -r /tmp/requirements.txt
