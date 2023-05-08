@@ -4,21 +4,11 @@ from fastapi import (
     APIRouter,
     Depends,
 )
-from sqlmodel import (
-    # select,
-    Session,
-)
 from sqlalchemy.sql import text
+from sqlmodel import Session
 
-# from app.api.auth import authenticated
-from app.db import get_session
 from app.core.config import API_VERSION
-
-# from .util import (
-#     materials_filter_params,
-#     PaginationParams,
-#     pagination_params,
-# )
+from app.db import get_session
 
 api = import_module(f".{API_VERSION}", package="app.api")
 router = APIRouter()
@@ -27,8 +17,6 @@ router = APIRouter()
 @router.get(
     "/db-version",
     response_model=dict,
-    # dependencies=[Security(authenticated)],
-    # tags=["Healthcheck", "Authenticated"],
     tags=["Healthcheck"],
 )
 async def db_version(session: Session = Depends(get_session)):

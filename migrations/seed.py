@@ -11,7 +11,12 @@ def seed_address_table(n):
     session = next(get_session())
     print(f"Seeding {Address} data.")
     for _ in range(n):
-        session.add(Address(street_nr=fake.street_address(), city=fake.city(),))
+        session.add(
+            Address(
+                street_nr=fake.street_address(),
+                city=fake.city(),
+            )
+        )
     session.commit()
     print(f"Seeded {Address} data.")
 

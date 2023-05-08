@@ -17,6 +17,7 @@ ENV POETRY_CACHE_DIR=/opt/.poetry-cache \
 RUN pip install --upgrade pip setuptools \
     && pip install poetry=="${POETRY_VERSION}"
 COPY pyproject.toml poetry.lock* ./
+# hadolint ignore=SC1091
 RUN python -m venv /venv \
     && . /venv/bin/activate \
     && poetry install --only main \
