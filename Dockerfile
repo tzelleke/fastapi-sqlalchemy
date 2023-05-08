@@ -1,25 +1,49 @@
-FROM tiangolo/uvicorn-gunicorn:python3.10 as dev
-ARG USER=fastapi
-ENV POETRY_VERSION=1.4 \
-    POETRY_VIRTUALENVS_CREATE=true
-RUN echo $POETRY_VERSION
-RUN pip install -U --no-cache-dir pip && \
-    pip uninstall -y -r /tmp/requirements.txt && \
-    pip install --no-cache-dir "poetry==${POETRY_VERSION}"
-RUN useradd -m "${USER}"
-USER "${USER}"
-COPY pyproject.toml poetry.lock* ./
-RUN poetry install --no-root --no-interaction --no-ansi
-RUN ln -s $(poetry env info --path) "/home/${USER}/venv"
-ENV PATH="/home/${USER}/venv/bin:${PATH}"
-COPY ./ /app
+# hadolint global ignore=DL3045
+ARG POETRY_VERSION=1.4
 
-FROM tiangolo/uvicorn-gunicorn:python3.10-slim as prod
-ARG USER=fastapi
-RUN pip install -U --no-cache-dir pip && \
-    pip uninstall -y -r /tmp/requirements.txt
-RUN useradd -m "${USER}"
-USER "${USER}"
-COPY --from=dev "/home/${USER}" "/home/${USER}"
-ENV PATH="/home/${USER}/venv/bin:${PATH}"
-COPY ./ /app
+FROM tiangolo/uvicorn-gunicorn:python3.10-slim as base
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+FROM base as poetry
+ARG POETRY_VERSION
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_IGNORE_INSTALLED=1 \
+    PIP_NO_CACHE_DIR=1
+ENV POETRY_CACHE_DIR=/opt/.poetry-cache
+# hadolint ignore=DL3013
+RUN pip install --upgrade pip setuptools \
+    && pip install poetry=="${POETRY_VERSION}"
+COPY pyproject.toml poetry.lock* ./
+RUN python -m venv /venv \
+    && . /venv/bin/activate \
+    && poetry install --only main \
+    --no-root --no-interaction --no-ansi
+COPY <<-EOT /entrypoint.sh
+#!/usr/bin/env sh
+set -e
+. /venv/bin/activate
+exec "\$@"
+EOT
+
+RUN chmod +x /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
+
+FROM poetry as test
+# hadolint ignore=SC1091
+RUN . /venv/bin/activate \
+    && poetry install --only main,test \
+    --no-root --no-interaction --no-ansi
+COPY . .
+
+FROM test as dev
+# hadolint ignore=SC1091
+RUN . /venv/bin/activate \
+    && poetry install \
+    --no-root --no-interaction --no-ansi
+
+FROM base as prod
+COPY --from=poetry /venv /venv
+ENV PATH="/venv/bin:${PATH}"
+COPY . .
+CMD ["/start.sh"]
