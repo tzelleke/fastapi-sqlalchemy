@@ -7,7 +7,7 @@ from app.core.config import DATABASE_URL
 # from app.core.logging import logger
 
 engine = create_engine(
-    str(DATABASE_URL), echo=True, connect_args=dict(check_same_thread=False),
+    DATABASE_URL, echo=True, connect_args=dict(check_same_thread=False),
 )
 
 

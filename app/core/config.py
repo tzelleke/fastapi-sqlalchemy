@@ -1,6 +1,5 @@
 import os
 
-from databases import DatabaseURL
 from starlette.datastructures import CommaSeparatedStrings
 
 PROJECT_NAME = os.getenv("PROJECT_NAME", "FastAPI-SQLAlchemy")
@@ -18,8 +17,4 @@ if not DATABASE_URL:
     POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
     POSTGRES_DB = os.getenv("POSTGRES_DB")
 
-    DATABASE_URL = DatabaseURL(
-        f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:5432/{POSTGRES_DB}"
-    )
-else:
-    DATABASE_URL = DatabaseURL(DATABASE_URL)
+    DATABASE_URL = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:5432/{POSTGRES_DB}"
