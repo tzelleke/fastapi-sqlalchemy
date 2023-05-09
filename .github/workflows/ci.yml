@@ -1,34 +1,73 @@
-name: ci
-on:
-  push:
-    branches:
-      - master
+name: CI
+
+on: [ push, workflow_dispatch ]
+
+env:
+  TEST_TAG: tzelleke/plotly-dash-app:test
+
 jobs:
-  build:
+  lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: docker/setup-buildx-action@v2
-      - uses: docker/build-push-action@v4
-        with:
-          context: .
-          target: dev
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          load: true
-          tags: test_image:latest
-      - run: docker run test_image:latest poetry about
-  deploy:
+    - uses: actions/checkout@v3
+    - uses: psf/black@stable
+    - uses: chartboost/ruff-action@v1
+    - uses: hadolint/hadolint-action@v3.1.0
+
+  test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v3
-        with:
-          python-version: 3.x
-      - run: pip install \
-             mkdocs-material \
-             mkdocs-macros-plugin \
-             mkdocs-awesome-pages-plugin \
-             mkdocstrings \
-             mkdocs-mermaid2-plugin
-      - run: mkdocs gh-deploy --force
+    - uses: actions/checkout@v3
+    - uses: docker/setup-buildx-action@v2
+    - uses: docker/build-push-action@v4
+      with:
+        context: .
+        target: test
+        load: true
+        tags: ${{ env.TEST_TAG }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+    - name: Run pytest in container
+      run: |
+        set -o pipefail
+        mkdir share
+        docker run --rm -i \
+        -v $(pwd)/share:/root/pytest \
+        ${{ env.TEST_TAG }} pytest
+    - name: Render coverage report to step summary
+      run: |
+        set -o pipefail
+        echo '# Coverage report' >> $GITHUB_STEP_SUMMARY
+        docker run --rm -i \
+        -v $(pwd)/share:/root/pytest \
+        ${{ env.TEST_TAG }} coverage report --format=markdown >> $GITHUB_STEP_SUMMARY
+
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      docs: ${{ steps.filter.outputs.docs }}
+    steps:
+    - uses: actions/checkout@v3
+    - uses: dorny/paths-filter@v2
+      id: filter
+      with:
+        filters: |
+          docs:
+            - 'docs/**'
+
+  deploy-docs:
+    needs: changes
+    if: ${{ needs.changes.outputs.docs == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v3
+      with:
+        python-version: 3.x
+    - run: pip install \
+        mkdocs-material \
+        mkdocs-macros-plugin \
+        mkdocs-awesome-pages-plugin \
+        mkdocstrings \
+        mkdocs-mermaid2-plugin
+    - run: mkdocs gh-deploy --force
